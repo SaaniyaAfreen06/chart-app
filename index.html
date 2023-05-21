@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chart App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    h1 {
+      margin-bottom: 1rem;
+    }
+    #chartContainer {
+      width: 600px;
+      height: 400px;
+      margin-bottom: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Historical Price Chart</h1>
+  
+  <div>
+    <label for="symbol">Symbol:</label>
+    <select id="symbol">
+      <option value="NIFTY 50">NIFTY 50</option>
+      <option value="BANKNIFTY">BANK NIFTY</option>
+    </select>
+  </div>
+  
+  <div>
+    <label for="fromDate">From:</label>
+    <input type="date" id="fromDate">
+  </div>
+  
+  <div>
+    <label for="toDate">To:</label>
+    <input type="date" id="toDate">
+  </div>
+  
+  <button id="fetchData">Fetch Data</button>
+  
+  <canvas id="chartContainer"></canvas>
+
+  <script src="chart.umd.js"></script>
+
+  <script>
+    const fetchDataButton = document.getElementById('fetchData');
+    const symbolInput = document.getElementById('symbol');
+    const fromDateInput = document.getElementById('fromDate');
+    const toDateInput = document.getElementById('toDate');
+    const chartContainer = document.getElementById('chartContainer');
+    
+    fetchDataButton.addEventListener('click', () => {
+      const symbol = symbolInput.value;
+      const fromDate = fromDateInput.value;
+      const toDate = toDateInput.value;
+      
+      fetch(`/historical-data?symbol=${symbol}&from_date=${fromDate}&to_date=${toDate}`)
+        .then(response => response.json())
+        .then(data => {
+          const dates = data.map(entry => entry.date);
+          const prices = data.map(entry => entry.price);
+          
+          renderChart(dates, prices);
+        })
+        .catch(error => console.error(error));
+    });
+    
+    function renderChart(dates, prices) {
+  const ctx = chartContainer.getContext('2d');
+  
+  // Destroy previous chart instance if it exists
+  if (window.myChart) {
+    window.myChart.destroy();
+  }
+
+  window.myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: dates,
+      datasets: [{
+        label: 'Price',
+        data: prices,
+        borderColor: 'blue',
+        fill: false
+      }]
+    },
+    options: {
+      scales: {
+        x: {
+          display: true,
+          title: {
+            display: true,
+            text: 'Date'
+          }
+        },
+        y: {
+          display: true,
+          title: {
+            display: true,
+            text: 'Price'
+          }
+        }
+      }
+    }
+  });
+}
+
+  </script>
+</body>
+</html>
