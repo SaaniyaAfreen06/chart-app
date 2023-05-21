@@ -5,4 +5,4 @@ Create a folder called public and add index.html and chart.umd
 
 
 
-Run the server node server.js
+Run the server - node server.js
